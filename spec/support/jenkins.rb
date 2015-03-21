@@ -42,6 +42,7 @@ class Jenkins::Server
   def kill
     Process.kill 'TERM', job
     Process.waitpid job, Process::WNOHANG
+  rescue Errno::ECHILD => e
   ensure
     FileUtils.rm_rf workdir
   end
