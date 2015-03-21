@@ -1,0 +1,27 @@
+{
+  "before": "0000000000000000000000000000000000000000",
+  "after": "80a89e1156d5d7e9471c245ccaeafb7bcb49c0a5",
+  "ref": "refs/heads/feature/branch",
+  "user_id": 1,
+  "user_name": "root",
+  "project_id": 1,
+  "repository": {
+    "name": "testrepo",
+    "url": "localhost:%{repodir}",
+    "description": "",
+    "homepage": "https://localhost/tmp/testrepo"
+  },
+  "commits": [
+    {
+      "id": "80a89e1156d5d7e9471c245ccaeafb7bcb49c0a5",
+      "message": "Add new file\n",
+      "timestamp": "2015-03-14T23:25:22+01:00",
+      "url": "https://localhost/tmp/testrepo/commit/80a89e1156d5d7e9471c245ccaeafb7bcb49c0a5",
+      "author": {
+        "name": "root",
+        "email": "root@localhost"
+      }
+    }
+  ],
+  "total_commits_count": 1
+}

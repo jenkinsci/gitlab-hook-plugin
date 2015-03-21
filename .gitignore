@@ -1,6 +1,8 @@
 # exclude Jenkins work files
 pkg
-work
+
+# exclude repository for acceptance tests
+spec/fixtures/testrepo.git
 
 # exclude Idea files
 .idea
