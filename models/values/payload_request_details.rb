@@ -43,7 +43,7 @@ module GitlabWebHook
 
     def get_commits
       @commits ||= payload["commits"].to_a.map do |commit|
-        Commit.new(commit["url"], commit["message"])
+        Commit.new(commit["url"], commit["message"],  commit["author"]["name"])
       end
     end
 
