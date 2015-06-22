@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'GitlabNotifier URL parser' do
 
-  giturl = Regexp.new '((?<scheme>[a-z]+)://)?((?<user>[a-z]+)@)?(?<host>[^:/]+)(:(?<port>[0-9]+))?([/:])?(?<path>(?<namespace>[^/]+)/(?<reponame>[^.]+)(.git)?.*)'
+  giturl = Regexp.new '((?<scheme>[a-z]+)://)?((?<user>[a-z]+)@)?(?<host>[^:/]+)(:(?<port>[0-9]+))?([/:]/?)?(?<path>(?<namespace>[^/]+)/(?<reponame>[^.]+)(.git)?.*)'
 
   [
     "git@github.com:javiplx/jenkins-gitlab-hook-plugin.git",
@@ -18,6 +18,12 @@ describe 'GitlabNotifier URL parser' do
       it { expect(urlmatch['namespace']).to eq 'javiplx' }
       it { expect(urlmatch['reponame']).to eq 'jenkins-gitlab-hook-plugin' }
     end
+  end
+
+  context "parses url used on tests}" do
+    urlmatch = giturl.match "localhost:/javiplx/jenkins-gitlab-hook-plugin.git"
+    it { expect(urlmatch['namespace']).to eq 'javiplx' }
+    it { expect(urlmatch['reponame']).to eq 'jenkins-gitlab-hook-plugin' }
   end
 
 end

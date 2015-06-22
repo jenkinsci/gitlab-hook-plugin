@@ -135,7 +135,9 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
     @client = Gitlab::Client.new @descriptor
   end
 
-  giturl = Regexp.new '((?<scheme>[a-z]+)://)?((?<user>[a-z]+)@)?(?<host>[^:/]+)(:(?<port>[0-9]+))?([/:])?(?<path>(?<namespace>[^/]+)/(?<reponame>[^.]+)(.git)?.*)'
+  def giturl
+    Regexp.new '((?<scheme>[a-z]+)://)?((?<user>[a-z]+)@)?(?<host>[^:/]+)(:(?<port>[0-9]+))?([/:]/?)?(?<path>(?<namespace>[^/]+)/(?<reponame>[^.]+)(.git)?.*)'
+  end
 
   def repo_namespace(build)
     @project = GitlabWebHook::Project.new build.native.project
