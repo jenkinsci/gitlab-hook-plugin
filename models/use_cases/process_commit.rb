@@ -44,6 +44,12 @@ module GitlabWebHook
           end
         end
         return if projects.any?
+        settings.templated_descriptions.each do |matchstr,template|
+          if details.repository_description.index matchstr
+            projects << @create_project_for_branch.from_template(template, details)
+          end
+        end
+        return if projects.any?
         settings.templated_groups.each do |matchstr,template|
           if details.repository_group == matchstr
             projects << @create_project_for_branch.from_template(template, details)

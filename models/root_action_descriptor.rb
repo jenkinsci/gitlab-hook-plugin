@@ -59,6 +59,7 @@ class GitlabWebHookRootActionDescriptor < Jenkins::Model::DefaultDescriptor
       @description                  = read_property(doc, DESCRIPTION_PROPERTY)
       @templates                    = get_templates doc.root.elements['templates']
       @group_templates              = get_templates doc.root.elements['group_templates']
+      @description_templates        = get_templates doc.root.elements['description_templates']
       @template                     = doc.root.elements['template'] && doc.root.elements['template'].text
     end
   end
@@ -90,6 +91,13 @@ class GitlabWebHookRootActionDescriptor < Jenkins::Model::DefaultDescriptor
       new.add_element('project').add_text(v)
     end
 
+    tpls = doc.root.add_element( 'description_templates' )
+    templated_descriptions.each do |k,v|
+      new = tpls.add_element('template')
+      new.add_element('string').add_text(k)
+      new.add_element('project').add_text(v)
+    end
+
     tpls = doc.root.add_element( 'group_templates' )
     templated_groups.each do |k,v|
       new = tpls.add_element('template')
@@ -114,6 +122,10 @@ class GitlabWebHookRootActionDescriptor < Jenkins::Model::DefaultDescriptor
     @templates || {}
   end
 
+  def templated_descriptions
+    @description_templates || {}
+  end
+
   def templated_groups
     @group_templates || {}
   end
@@ -135,6 +147,9 @@ class GitlabWebHookRootActionDescriptor < Jenkins::Model::DefaultDescriptor
     end
     @template = form['template']
     @templates = form['templates'] && form2list( form['templates'] ).inject({}) do |hash, item|
+      hash.update( item['string'] => item['project'] )
+    end
+    @description_templates = form['description_templates'] && form2list( form['description_templates'] ).inject({}) do |hash, item|
       hash.update( item['string'] => item['project'] )
     end
     @group_templates = form['group_templates'] && form2list( form['group_templates'] ).inject({}) do |hash, item|

@@ -49,6 +49,19 @@ An already existing jenkins project will be used as base, and different kind of 
 
       end
 
+      f.entry :title => 'Templates for project description', :description => 'The incoming repository description is compared with the match string' do
+        f.repeatable :items => descriptor.templated_descriptions.to_a, :var => 'description_templates', :add => 'Add new description template' do
+          %><table width="100%"><%
+          f.entry :title => 'Match string', :field => 'string' do
+            f.textbox :default => "#{description_templates.nil? ? '' : description_templates.first }"
+          end
+          f.entry :title => 'Base project', :field => 'project' do
+            f.textbox :default => "#{description_templates.nil? ? '' : description_templates.last }"
+          end
+          %></table><div align="right"><%f.repeatableDeleteButton%></div><%
+        end
+      end
+
       f.entry :title => 'Templates for gitlab groups', :description => 'Full string comparison is performed with the incoming repository' do
         f.repeatable :items => descriptor.templated_groups.to_a, :var => 'group_templates', :add => 'Add new group template' do
           %><table width="100%"><%
