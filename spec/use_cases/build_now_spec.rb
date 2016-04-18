@@ -23,6 +23,14 @@ module GitlabWebHook
       end
     end
 
+    context 'when user_name is Jenkins' do
+      it 'skips the build' do
+        allow(details.payload).to receive(:user_name?) { 'Jenkins' }
+        expect(project).not_to receive(:scheduleBuild2)
+        expect(subject.with(details, GetBuildActions.new, GetBuildCause.new)).to match('not building for a Jenkins')
+      end
+    end
+
     context 'when build triggered' do
       let(:cause_builder) { double(with: true) }
       let(:actions_builder) { double(with: true) }
