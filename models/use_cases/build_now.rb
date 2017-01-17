@@ -13,9 +13,10 @@ module GitlabWebHook
       raise ArgumentError.new('project is required') unless project
       @project = project
       @logger = logger
-    end
+    en
 
     def with(details, cause_builder = GetBuildCause.new, actions_builder = GetBuildActions.new)
+      return "#{project} not building for a Jenkins commit" if details.flat_payload.user_name == 'Jenkins'
       return "#{project} is configured to ignore notify commit, skipping the build" if project.ignore_notify_commit?
       return "#{project} is not buildable (it is disabled or not saved), skipping the build" unless project.buildable?
       raise ArgumentError.new('details are required') unless details
