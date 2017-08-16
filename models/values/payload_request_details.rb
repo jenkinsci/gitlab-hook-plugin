@@ -12,9 +12,13 @@ module GitlabWebHook
     end
 
     def repository_url
-      return "" unless payload["repository"]
-      return "" unless payload["repository"]["url"]
-      payload["repository"]["url"].strip
+      if payload["project"] && payload["project"]["git_http_url"]
+        payload["project"]["git_http_url"].strip
+      elsif payload["repository"] && payload["repository"]["url"]
+        payload["repository"]["url"].strip
+      else
+        ""
+      end
     end
 
     def repository_group
@@ -23,19 +27,33 @@ module GitlabWebHook
     end
 
     def repository_name
-      return "" unless payload["repository"]
-      return "" unless payload["repository"]["name"]
-      payload["repository"]["name"].strip
+      if payload["project"] && payload["project"]["name"]
+        payload["project"]["name"].strip
+      elsif payload["repository"] && payload["repository"]["name"]
+        payload["repository"]["name"].strip
+      else
+        ""
+      end
     end
 
     def repository_homepage
-      return "" unless payload["repository"]
-      return "" unless payload["repository"]["homepage"]
-      payload["repository"]["homepage"].strip
+      if payload["project"] && payload["project"]["homepage"]
+        payload["project"]["homepage"].strip
+      elsif payload["repository"] && payload["repository"]["homepage"]
+        payload["repository"]["homepage"].strip
+      else
+        ""
+      end
     end
 
     def full_branch_reference
-      payload["ref"].to_s.strip
+      if payload["ref"]
+        payload["ref"].to_s.strip
+      elsif payload["changes"] && payload["changes"][0] && payload["changes"][0]["ref"]
+        payload["changes"][0]["ref"].strip
+      else
+        ""
+      end
     end
 
     def delete_branch_commit?
