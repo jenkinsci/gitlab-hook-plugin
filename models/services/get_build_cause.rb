@@ -1,6 +1,7 @@
 include Java
 
 java_import Java.hudson.model.Cause
+java_import Java.hudson.model.CauseAction
 
 module GitlabWebHook
   class GetBuildCause
@@ -8,7 +9,7 @@ module GitlabWebHook
       raise ArgumentError.new('details are required') unless details
 
       notes = details.payload ? from_payload(details) : 'no payload available'
-      Cause::RemoteCause.new(details.repository_uri.host, notes)
+      CauseAction.new(Cause::RemoteCause.new(details.repository_uri.host, notes))
     end
 
     def from_payload(details)

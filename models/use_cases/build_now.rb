@@ -8,6 +8,7 @@ module GitlabWebHook
 
     java_import Java.java.util.logging.Logger
     java_import Java.java.util.logging.Level
+    java_import Java.hudson.model.Action
 
     def initialize(project, logger = Logger.getLogger(self.class.name))
       raise ArgumentError.new('project is required') unless project
@@ -21,7 +22,9 @@ module GitlabWebHook
       raise ArgumentError.new('details are required') unless details
 
       begin
-        return "#{project} scheduled for build" if project.scheduleBuild2(project.getQuietPeriod(), cause_builder.with(details), actions_builder.with(project, details))
+        causeAction = cause_builder.with(details)
+        actions = [ causeAction ] + actions_builder.with(project, details)
+        return "#{project} scheduled for build" if project.scheduleBuild2(project.getQuietPeriod(), actions.to_java(Action) )
       rescue java.lang.Exception => e
         # avoid method signature warnings
         severe = logger.java_method(:log, [Level, java.lang.String, java.lang.Throwable])

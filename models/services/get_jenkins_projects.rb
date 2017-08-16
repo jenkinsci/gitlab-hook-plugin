@@ -5,7 +5,7 @@ require_relative '../services/security'
 
 include Java
 
-java_import Java.hudson.model.AbstractProject
+java_import Java.hudson.model.Job
 java_import Java.hudson.matrix.MatrixConfiguration
 
 java_import Java.hudson.plugins.git.GitSCM
@@ -51,7 +51,7 @@ module GitlabWebHook
     def all
       projects = nil
       Security.impersonate(ACL::SYSTEM) do
-        projects = Java.jenkins.model.Jenkins.instance.getAllItems(AbstractProject.java_class).map do |jenkins_project|
+        projects = Java.jenkins.model.Jenkins.instance.getAllItems(Job.java_class).map do |jenkins_project|
           Project.new(jenkins_project) unless jenkins_project.java_kind_of?(MatrixConfiguration)
         end - [nil]
       end

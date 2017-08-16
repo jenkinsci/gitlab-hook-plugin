@@ -7,6 +7,7 @@ require_relative 'repository_uri'
 
 include Java
 
+java_import Java.hudson.model.AbstractProject
 java_import Java.hudson.model.ParametersDefinitionProperty
 java_import Java.hudson.model.StringParameterDefinition
 java_import Java.hudson.model.ChoiceParameterDefinition
@@ -214,12 +215,18 @@ module GitlabWebHook
 
     def setup_scms
       @scms = []
-      if jenkins_project.scm
-        if jenkins_project.scm.java_kind_of?(GitSCM)
-          @scms << jenkins_project.scm
-        elsif MultipleScmsPluginAvailable && jenkins_project.scm.java_kind_of?(MultiSCM)
-          @multiscm = true
-          @scms.concat(jenkins_project.scm.getConfiguredSCMs().select { |scm| scm.java_kind_of?(GitSCM) })
+      if jenkins_project.java_kind_of?(AbstractProject)
+        if jenkins_project.scm
+          if jenkins_project.scm.java_kind_of?(GitSCM)
+            @scms << jenkins_project.scm
+          elsif MultipleScmsPluginAvailable && jenkins_project.scm.java_kind_of?(MultiSCM)
+            @multiscm = true
+            @scms.concat(jenkins_project.scm.getConfiguredSCMs().select { |scm| scm.java_kind_of?(GitSCM) })
+          end
+        end
+      else
+        if jenkins_project.getSCMs()
+          @scms.concat(jenkins_project.getSCMs().select { |scm| scm.java_kind_of?(GitSCM) })
         end
       end
     end
