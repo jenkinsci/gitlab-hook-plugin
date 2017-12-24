@@ -20,4 +20,3 @@ matrix:
       jdk: openjdk7
 group: deprecated-2017Q3
 sudo: required
-dist: precise
