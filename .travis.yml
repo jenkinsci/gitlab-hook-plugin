@@ -18,5 +18,4 @@ matrix:
       jdk: openjdk7
     - env: JENKINS_VERSION=latest
       jdk: openjdk7
-group: deprecated-2017Q3
 sudo: required
