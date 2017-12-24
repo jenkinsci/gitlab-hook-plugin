@@ -18,4 +18,3 @@ matrix:
       jdk: openjdk7
     - env: JENKINS_VERSION=latest
       jdk: openjdk7
-sudo: required
