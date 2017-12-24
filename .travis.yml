@@ -1,8 +1,7 @@
 language: ruby
 env:
   - JENKINS_VERSION=1.651.3
-  - JENKINS_VERSION=2.46.3
-  - JENKINS_VERSION=2.60.3
+  - JENKINS_VERSION=2.89.2
   - JENKINS_VERSION=latest
 jdk:
   - oraclejdk8
@@ -13,10 +12,9 @@ rvm:
 matrix:
   exclude:
     - env: JENKINS_VERSION=1.651.3
+      jdk: openjdk7
       rvm: 1.9.3
-    - env: JENKINS_VERSION=1.651.3
-      rvm: 1.9.3
-    - env: JENKINS_VERSION=2.60.3
+    - env: JENKINS_VERSION=2.89.2
       jdk: openjdk7
     - env: JENKINS_VERSION=latest
       jdk: openjdk7
