@@ -52,7 +52,7 @@ class Jenkins::Server
     @job = fork do
       $stdout.reopen out
       $stderr.reopen err
-      ENV['JAVA_OPTS'] = "-XX:MaxPermSize=512m -Xms512m -Xmx1024m -Djruby.compile.mode=OFF -Djruby.objectspace.enabled=false"
+      ENV['JAVA_OPTS'] = "-XX:MaxPermSize=512m -Xms512m -Xmx1024m -Djruby.compile.mode=OFF -Djruby.objectspace.enabled=false -Dhudson.DNSMultiCast.disabled=true"
       server.run!
     end
     Process.detach job
