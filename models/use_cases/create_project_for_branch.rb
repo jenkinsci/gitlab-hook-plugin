@@ -6,6 +6,7 @@ require_relative '../services/build_scm'
 require_relative '../util/settings'
 require_relative '../services/security'
 
+java_import Java.hudson.model.AbstractProject
 java_import Java.hudson.plugins.git.GitSCM
 java_import Java.hudson.plugins.git.BranchSpec
 java_import Java.hudson.plugins.git.UserRemoteConfig
@@ -32,7 +33,7 @@ module GitlabWebHook
 
       Security.impersonate(ACL::SYSTEM) do
         branch_project = Java.jenkins.model.Jenkins.instance.copy(copy_from.jenkins_project, new_project_name)
-        branch_project.scm = new_project_scm
+        set_scm(branch_project, new_project_scm)
         branch_project.makeDisabled(false)
         branch_project.description = settings.description
         branch_project.save
@@ -44,15 +45,15 @@ module GitlabWebHook
     def from_template(template, details)
       return if details.branch.empty?
       copy_from = get_template_project(template)
-      raise ConfigurationException.new("Templates with multiples-scms plugin not supported") if copy_from.multiscm?
       new_project_name = details.repository_name
       raise ConfigurationException.new("project #{new_project_name} already created from #{template}") unless @get_jenkins_projects.named(new_project_name).empty?
-      modified_scm = @build_scm.with(copy_from.jenkins_project.scm, details, true)
+      @logger.warning( "Multiple-SCMs project #{copy_from} incompletelly copied onto #{new_project_name}" ) if copy_from.multiscm?
+      modified_scm = @build_scm.with(copy_from.jenkins_project.getSCMs().find.first, details, true)
       branch_project = nil
 
       Security.impersonate(ACL::SYSTEM) do
         branch_project = Java.jenkins.model.Jenkins.instance.copy(copy_from.jenkins_project, new_project_name)
-        branch_project.scm = modified_scm
+        set_scm(branch_project, modified_scm)
         branch_project.makeDisabled(false)
         branch_project.save
       end
@@ -72,7 +73,7 @@ module GitlabWebHook
 
         Security.impersonate(ACL::SYSTEM) do
           new_project = Java.jenkins.model.Jenkins.instance.copy(copy_from.jenkins_project, new_project_name)
-          new_project.scm = cloned_scm
+          set_scm(new_project, cloned_scm)
           new_project.makeDisabled(false)
           new_project.description = settings.description
           new_project.save
@@ -107,6 +108,15 @@ module GitlabWebHook
       raise ConfigurationException.new("project #{new_project_name} already exists") unless @get_jenkins_projects.named(new_project_name).empty?
       new_project_name
     end
-
+    
+    def set_scm(project, scm)
+      if project.java_kind_of?(AbstractProject)
+        project.scm = scm
+      else
+        definition = Java.org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition.new(scm, project.definition.getScriptPath())
+        project.definition = definition
+      end
+    end
+    
   end
 end
