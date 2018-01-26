@@ -28,6 +28,12 @@ module GitlabWebHook
       payload["repository"]["name"].strip
     end
 
+    def repository_description
+      return "" unless payload["repository"]
+      return "" unless payload["repository"]["description"]
+      payload["repository"]["description"].strip
+    end
+
     def repository_homepage
       return "" unless payload["repository"]
       return "" unless payload["repository"]["homepage"]
