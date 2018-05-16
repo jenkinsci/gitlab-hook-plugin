@@ -248,7 +248,8 @@ No special options are required to execute the test on recent JRuby versions (su
 ## Development
 
 Locally building:
-- Download latest stable jruby tar
+- Download latest stable jruby tar, recommended to be in 1.9 mode
+-- `rvm install jruby-1.7.27 --1.9`  
 - Extract and add bin/ directory to your $PATH
 - To install run:
 -- `export GEM_HOME=~/.ruby/gems`
@@ -258,7 +259,7 @@ Locally building:
 To test locally in Jenkins
 - Download latest Jenkins distribution
 - Extract and run `java -jar jenkins.war`
-- Upload `pkg/gitlab-hook-nojenkinscommits.hpi` into Jenkins manual install interface
+- Upload `pkg/gitlab-hook.hpi` into Jenkins manual install interface
 
-Example post bodies are available on the [gitlab webhook page](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/web_hooks/web_hooks.md)
+Example post bodies are available on the [gitlab webhook page](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/user/project/integrations/webhooks.md)
 
