@@ -72,7 +72,7 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
     attr_reader :gitlab_url
 
     def token
-      @token.get_plain_text
+      Secret.toString @token
     end
 
     def commit_status?
