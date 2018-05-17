@@ -12,6 +12,7 @@ require_relative 'services/parse_request'
 require_relative 'services/check_git_details'
 
 java_import Java.org.jruby.exceptions.RaiseException
+java_import Java.hudson.model.Action
 
 module GitlabWebHook
   class Api < Sinatra::Base
@@ -41,7 +42,11 @@ module GitlabWebHook
         cause_builder = GetBuildCause.new
         actions_builder = GetBuildActions.new
         details = parse_request
-        project.scheduleBuild2(project.getQuietPeriod(), cause_builder.with(details), actions_builder.with(project, details))
+        actions = [cause_builder.with(details)]
+        if project.multibranchProject?
+          actions.concat actions_builder.with(project, details)
+        end
+        project.scheduleBuild2(project.getQuietPeriod(), actions.to_java(Action))
       end
     end
 

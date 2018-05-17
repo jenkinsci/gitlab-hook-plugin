@@ -14,8 +14,17 @@ java_import Java.hudson.util.StreamTaskListener
 java_import Java.hudson.util.NullStream
 java_import Java.hudson.plugins.git.GitSCM
 java_import Java.hudson.plugins.git.util.InverseBuildChooser
+java_import Java.hudson.plugins.git.util.DefaultBuildChooser
 java_import Java.hudson.plugins.git.extensions.impl.PreBuildMerge
 java_import Java.hudson.plugins.git.extensions.impl.RelativeTargetDirectory
+
+MultiBranchPluginAvailable = true
+begin
+  java_import Java.jenkins.branch.MultiBranchProject
+  java_import Java.jenkins.scm.api.SCMSource
+rescue NameError
+  MultiBranchPluginAvailable = false
+end
 
 MultipleScmsPluginAvailable = true
 begin
@@ -31,9 +40,8 @@ module GitlabWebHook
     include Settings
     extend Forwardable
 
-    def_delegators :@jenkins_project, :schedulePolling, :scheduleBuild2, :fullName, :isParameterized, :isBuildable, :getQuietPeriod, :getProperty, :delete, :description
+    def_delegators :@jenkins_project, :schedulePolling, :scheduleBuild, :scheduleBuild2, :fullName, :isParameterized, :isBuildable, :getProperty, :delete, :description
 
-    alias_method :parametrized?, :isParameterized
     alias_method :buildable?, :isBuildable
     alias_method :name, :fullName
     alias_method :to_s, :fullName
@@ -58,6 +66,27 @@ module GitlabWebHook
       end
     end
 
+    def multibranchProject?
+      if MultiBranchPluginAvailable
+        return jenkins_project.java_kind_of?(MultiBranchProject)
+      end
+      return false
+    end
+
+    def getQuietPeriod
+      if multibranchProject?
+        return 0
+      end
+      return jenkins_project.getQuietPeriod()
+    end
+
+    def parametrized?
+      if !multibranchProject?
+        return @jenkins_project.isParameterized
+      end
+      return false
+    end
+
     def matches_uri?(details_uri)
       return false unless scms.any?
       matching_scms?(details_uri)
@@ -65,6 +94,7 @@ module GitlabWebHook
 
     def matches?(details, branch = false, exactly = false)
       return false unless buildable?
+      return true if multibranchProject?
       if merge_to?( branch || details.branch )
         logger.info("project #{self} merge target matches #{branch || details.branch}")
         return true
@@ -214,12 +244,23 @@ module GitlabWebHook
 
     def setup_scms
       @scms = []
-      if jenkins_project.scm
-        if jenkins_project.scm.java_kind_of?(GitSCM)
-          @scms << jenkins_project.scm
-        elsif MultipleScmsPluginAvailable && jenkins_project.scm.java_kind_of?(MultiSCM)
-          @multiscm = true
-          @scms.concat(jenkins_project.scm.getConfiguredSCMs().select { |scm| scm.java_kind_of?(GitSCM) })
+      if multibranchProject?
+        jenkins_project.getSCMSources.to_a.each { |scm_source|
+          scm_source.fetch(nil).to_a.each { |head|
+            scm = scm_source.build(head)
+            if scm.java_kind_of?(GitSCM)
+              @scms.push(scm)
+            end
+          }
+        }
+      else
+        if jenkins_project.scm
+          if jenkins_project.scm.java_kind_of?(GitSCM)
+            @scms << jenkins_project.scm
+          elsif MultipleScmsPluginAvailable && jenkins_project.scm.java_kind_of?(MultiSCM)
+            @multiscm = true
+            @scms.concat(jenkins_project.scm.getConfiguredSCMs().select { |scm| scm.java_kind_of?(GitSCM) })
+          end
         end
       end
     end

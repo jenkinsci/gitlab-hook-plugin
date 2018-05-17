@@ -18,7 +18,11 @@ module GitlabWebHook
       return "#{project} is not buildable (it is disabled or not saved), skipping polling" unless project.buildable?
 
       begin
-        return "#{project} scheduled for polling" if project.schedulePolling
+        if project.multibranchProject?
+          return "#{project} scheduled for polling" if project.scheduleBuild
+        else
+          return "#{project} scheduled for polling" if project.schedulePolling
+        end
       rescue java.lang.Exception => e
         # avoid method signature warnings
         severe = logger.java_method(:log, [Level, java.lang.String, java.lang.Throwable])
