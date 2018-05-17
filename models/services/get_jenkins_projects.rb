@@ -14,6 +14,13 @@ java_import Java.hudson.plugins.git.UserRemoteConfig
 java_import Java.hudson.plugins.git.browser.GitLab
 java_import Java.hudson.plugins.git.util.DefaultBuildChooser
 
+MultiBranchPluginAvailable = true
+begin
+  java_import Java.jenkins.branch.MultiBranchProject
+rescue NameError
+  MultiBranchPluginAvailable = false
+end
+
 module GitlabWebHook
   class GetJenkinsProjects
     include Settings
@@ -51,7 +58,11 @@ module GitlabWebHook
     def all
       projects = nil
       Security.impersonate(ACL::SYSTEM) do
-        projects = Java.jenkins.model.Jenkins.instance.getAllItems(AbstractProject.java_class).map do |jenkins_project|
+        temp = Java.jenkins.model.Jenkins.instance.getAllItems(AbstractProject.java_class).to_a
+        if MultiBranchPluginAvailable
+          temp.concat Java.jenkins.model.Jenkins.instance.getAllItems(MultiBranchProject.java_class).to_a
+        end
+        projects = temp.map do |jenkins_project|
           Project.new(jenkins_project) unless jenkins_project.java_kind_of?(MatrixConfiguration)
         end - [nil]
       end
