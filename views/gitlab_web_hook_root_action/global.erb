@@ -14,6 +14,10 @@
       f.checkbox :checked => "#{descriptor.merged_branch_triggering?}"
     end
 
+    f.entry :title => "Use HTTP URLs instead of SSH URLs", :field => 'use_http_urls' do
+      f.checkbox :checked => "#{descriptor.use_http_urls?}"
+    end
+
     f.optionalBlock :title => "Automatic project creation", :name => 'automatic_project_creation', :checked => "#{descriptor.automatic_project_creation?}" do
       f.entry :title => 'Project master branch', :field => 'master_branch' do
         f.textbox :default => "#{descriptor.master_branch}"

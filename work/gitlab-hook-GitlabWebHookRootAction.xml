@@ -2,6 +2,7 @@
 <hudson.model.Descriptor plugin='gitlab-hook'>
   <merge_request_processing>true</merge_request_processing>
   <merged_branch_triggering>true</merged_branch_triggering>
+  <use_http_urls>false</use_http_urls>
   <automatic_project_creation>true</automatic_project_creation>
   <master_branch>master</master_branch>
   <use_master_project_name>false</use_master_project_name>

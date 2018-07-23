@@ -1,10 +1,12 @@
 require_relative 'abstract_details'
 require_relative '../exceptions/bad_request_exception'
+require_relative '../util/settings'
 
 require 'gitlab'
 
 module GitlabWebHook
   class MergeRequestDetails < AbstractDetails
+    include Settings
 
     def initialize(payload)
       raise(ArgumentError.new("request payload is required")) unless payload
@@ -52,7 +54,7 @@ module GitlabWebHook
     end
 
     def repository_url
-      payload["source"] ? payload["source"]["ssh_url"] : extended["ssh_url_to_repo"]
+      payload["source"] ? payload["source"][settings.use_http_urls ? "git_http_url" : "ssh_url"] : extended["ssh_url_to_repo"]
     end
 
     def repository_name
