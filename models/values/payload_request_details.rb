@@ -1,7 +1,10 @@
 require_relative 'request_details'
+require_relative '../util/settings'
 
 module GitlabWebHook
   class PayloadRequestDetails < RequestDetails
+    include Settings
+      
     def initialize(payload)
       @payload = payload || raise(ArgumentError.new("request payload is required"))
       @kind = payload['object_kind'].nil? ? 'webhook' : payload['object_kind']
@@ -13,8 +16,8 @@ module GitlabWebHook
 
     def repository_url
       return "" unless payload["repository"]
-      return "" unless payload["repository"]["url"]
-      payload["repository"]["url"].strip
+      return "" unless payload["repository"][settings.use_http_urls ? "git_http_url" : "ssh_url"]
+      payload["repository"][settings.use_http_urls ? "git_http_url" : "ssh_url"].strip
     end
 
     def repository_group

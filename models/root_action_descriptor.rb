@@ -8,6 +8,7 @@ class GitlabWebHookRootActionDescriptor < Jenkins::Model::DefaultDescriptor
 
   MERGE_REQUEST_PROCESSING = 'merge_request_processing'
   MERGED_BRANCH_PROCESSING = 'merged_branch_triggering'
+  USE_HTTP_URLS = 'use_http_urls'
   AUTOMATIC_PROJECT_CREATION_PROPERTY = 'automatic_project_creation'
   MASTER_BRANCH_PROPERTY = 'master_branch'
   USE_MASTER_PROJECT_NAME_PROPERTY = 'use_master_project_name'
@@ -30,6 +31,10 @@ class GitlabWebHookRootActionDescriptor < Jenkins::Model::DefaultDescriptor
 
   def merged_branch_triggering?
     !!@merged_branch_triggering
+  end
+
+  def use_http_urls?
+    !!@use_http_urls
   end
 
   def automatic_project_creation?
@@ -56,6 +61,7 @@ class GitlabWebHookRootActionDescriptor < Jenkins::Model::DefaultDescriptor
       @ignore_usernames             = read_property(doc, IGNORE_USERS, DEFAULT_IGNORE_USERS)
       @merge_request_processing     = read_property(doc, MERGE_REQUEST_PROCESSING, "true") == "true"
       @merged_branch_triggering     = read_property(doc, MERGED_BRANCH_PROCESSING, "false") == "true"
+      @use_http_urls                = read_property(doc, USE_HTTP_URLS, "false") == "true"
       @automatic_project_creation   = read_property(doc, AUTOMATIC_PROJECT_CREATION_PROPERTY) == "true"
       @use_master_project_name      = read_property(doc, USE_MASTER_PROJECT_NAME_PROPERTY) == "true"
       @master_branch                = read_property(doc, MASTER_BRANCH_PROPERTY)
@@ -79,6 +85,7 @@ class GitlabWebHookRootActionDescriptor < Jenkins::Model::DefaultDescriptor
 
     write_property(doc, MERGE_REQUEST_PROCESSING, merge_request_processing?)
     write_property(doc, MERGED_BRANCH_PROCESSING, merged_branch_triggering?)
+    write_property(doc, USE_HTTP_URLS, use_http_urls?)
     write_property(doc, AUTOMATIC_PROJECT_CREATION_PROPERTY, automatic_project_creation?)
     write_property(doc, MASTER_BRANCH_PROPERTY, master_branch)
     write_property(doc, USE_MASTER_PROJECT_NAME_PROPERTY, use_master_project_name?)
@@ -136,6 +143,7 @@ class GitlabWebHookRootActionDescriptor < Jenkins::Model::DefaultDescriptor
     @ignore_usernames         = form[IGNORE_USERS]
     @merge_request_processing = form[MERGE_REQUEST_PROCESSING] ? true : false
     @merged_branch_triggering = form[MERGED_BRANCH_PROCESSING] ? true : false
+    @use_http_urls            = form[USE_HTTP_URLS] ? true : false
     @automatic_project_creation = form[AUTOMATIC_PROJECT_CREATION_PROPERTY] ? true : false
     if automatic_project_creation?
       @master_branch              = form[AUTOMATIC_PROJECT_CREATION_PROPERTY][MASTER_BRANCH_PROPERTY]
