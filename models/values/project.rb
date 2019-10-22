@@ -24,9 +24,17 @@ rescue NameError
   MultipleScmsPluginAvailable = false
 end
 
+GitParameterPluginAvailable = true
+begin
+  java_import 'net.uaznia.lukanus.hudson.plugins.gitparameter.GitParameterDefinition'
+rescue NameError
+  GitParameterPluginAvailable = false
+end
+
 module GitlabWebHook
   class Project
     BRANCH_NAME_PARAMETER_ACCEPTED_TYPES = [StringParameterDefinition, ChoiceParameterDefinition]
+    BRANCH_NAME_PARAMETER_ACCEPTED_TYPES << GitParameterDefinition if GitParameterPluginAvailable
 
     include Settings
     extend Forwardable
@@ -103,7 +111,13 @@ module GitlabWebHook
       end
 
       if branch_name_param && !BRANCH_NAME_PARAMETER_ACCEPTED_TYPES.any? { |type| branch_name_param.java_kind_of?(type) }
-        logger.warning("only string and choice parameters for branch parameter are supported")
+        if GitParameterPluginAvailable
+          message = "only string, choice and git parameters for branch parameter are supported"
+        else
+          message = "only string and choice parameters for branch parameter are supported"
+        end
+
+        logger.warning(message)
         return nil
       end
 
